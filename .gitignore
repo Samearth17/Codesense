@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+coverage/
+.pytest_cache/
+.ruff_cache/
+
+# Environment
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/
+
+# Data and model artifacts should be tracked deliberately through manifests.
+datasets/raw/
+datasets/processed/
+models/artifacts/
+*.pkl
+*.joblib
+*.onnx
+*.pt
+*.safetensors
