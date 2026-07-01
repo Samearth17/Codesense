@@ -13,5 +13,9 @@ IGNORE_DIRS = {
     "dist", "venv", ".tox", "tests", "test", "docs"
 }
 
+LANGUAGE_MAP = {
+    ".py": "python"
+}
+
 MIN_LINES = 15
 MAX_LINES = 400

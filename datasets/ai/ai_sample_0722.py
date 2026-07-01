@@ -1,0 +1,20 @@
+if digit == 0:
+    print("This is a zero.")
+elif digit == 1:
+    print("This is a one.")
+elif digit == 2:
+    print("This is a two.")
+elif digit == 3:
+    print("This is a three.")
+elif digit == 4:
+    print("This is a four.")
+elif digit == 5:
+    print("This is a five.")
+elif digit == 6:
+    print("This is a six.")
+elif digit == 7:
+    print("This is a seven.")
+elif digit == 8:
+    print("This is an eight.")
+elif digit == 9:
+    print("This is a nine.")

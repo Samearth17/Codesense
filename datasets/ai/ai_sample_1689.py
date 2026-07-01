@@ -1,0 +1,54 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+data = np.array([[1, 2],
+ [2, 3],
+ [2, 1],
+ [3, 3],
+ [4, 5],
+ [5, 6],
+ [5, 4]])
+
+# Number of clusters
+k = 2
+
+# Number of training data
+n = data.shape[0]
+
+# Number of features in the data
+c = data.shape[1]
+
+# Generate random centers, here we use sigma and mean to ensure it represent the whole data
+mean = np.mean(data, axis=0)
+std = np.std(data, axis=0)
+centers = np.random.randn(k, c)*std + mean
+
+# Plot the data and the centers generated as random
+plt.scatter(data[:, 0], data[:, 1], s=7)
+plt.scatter(centers[:, 0], centers[:, 1], marker='*', c='g', s=150)
+
+centers_old = np.zeros(centers.shape)  # to store old centers
+clusters = np.zeros(n)
+distances = np.zeros((n, k))
+
+error = np.linalg.norm(centers - centers_old)
+
+# When, after an update, the estimate of that center stays the same, exit loop
+while error != 0:
+ # Measure the distance to every center
+ for i in range(k):
+ distances[:, i] = np.linalg.norm(data - centers[i], axis=1)
+
+ # Assign all training data to closest center
+ clusters = np.argmin(distances, axis=1)
+
+ centers_old = centers.copy()
+
+ # Calculate mean for every cluster and update the center
+ for i in range(k):
+ centers[i] = np.mean(data[clusters == i], axis=0)
+ error = np.linalg.norm(centers - centers_old)
+
+# Plot the data and the centers generated as random
+plt.scatter(data[:, 0], data[:, 1], s=7)
+plt.scatter(centers[:, 0], centers[:, 1], marker='*', c='g', s=150)
