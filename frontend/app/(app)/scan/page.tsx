@@ -24,9 +24,76 @@ import {
   MetricCard,
 } from "@/components/ui";
 import { motionTokens, spacing, typography, type Accent } from "@/lib/design-tokens";
+import type { FeatureSnapshot, ScanRequest, ScanResult } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const DEFAULT_API_URL = "http://localhost:8000";
+const MAX_SCAN_RETRIES = 3;
+const RETRY_BASE_DELAY_MS = 350;
+
+class NonRetryableScanError extends Error {}
+
+function getApiUrl() {
+  if (typeof window !== "undefined") {
+    const runtimeApiUrl = window.__CODESENSE_CONFIG__?.NEXT_PUBLIC_API_URL?.trim();
+    if (runtimeApiUrl) return runtimeApiUrl;
+  }
+
+  return process.env.NEXT_PUBLIC_API_URL?.trim() || DEFAULT_API_URL;
+}
+
+function wait(ms: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function parseErrorDetail(detail: unknown, fallback: string) {
+  if (typeof detail === "string") return detail;
+  if (detail && typeof detail === "object" && "message" in detail) {
+    const message = (detail as { message?: unknown }).message;
+    if (typeof message === "string") return message;
+  }
+  return fallback;
+}
+
+async function parseScanError(response: Response) {
+  const body = await response.json().catch(() => null);
+  return parseErrorDetail(body?.detail, `Server returned ${response.status}`);
+}
+
+async function fetchScanWithRetry(request: ScanRequest): Promise<ScanResult> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= MAX_SCAN_RETRIES; attempt += 1) {
+    try {
+      const response = await fetch(`${getApiUrl()}/api/v1/scan`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(request),
+      });
+
+      if (!response.ok) {
+        const message = await parseScanError(response);
+        if (response.status < 500 && response.status !== 429) {
+          throw new NonRetryableScanError(message);
+        }
+        throw new Error(message);
+      }
+
+      return response.json() as Promise<ScanResult>;
+    } catch (err) {
+      if (err instanceof NonRetryableScanError) throw err;
+
+      lastError = err instanceof Error ? err : new Error("Analysis request failed");
+      if (attempt === MAX_SCAN_RETRIES) break;
+
+      await wait(RETRY_BASE_DELAY_MS * 2 ** attempt);
+    }
+  }
+
+  throw new Error(
+    lastError?.message || "The backend is unavailable. Check your API URL and try again.",
+  );
+}
 
 const EXAMPLE_CODE = `def fibonacci(n: int) -> list[int]:
     """Generate a Fibonacci sequence up to n terms.
@@ -56,26 +123,6 @@ def is_prime(num: int) -> bool:
         if num % i == 0:
             return False
     return True`;
-
-type FeatureSnapshot = {
-  docstring_ratio: number;
-  type_annotation_ratio: number;
-  maintainability_index: number;
-  avg_identifier_length: number;
-  single_char_var_ratio: number;
-  comment_density: number;
-  blank_line_ratio: number;
-  avg_cyclomatic_complexity: number;
-};
-
-type ScanResult = {
-  label: string;
-  confidence: number;
-  is_ai: boolean;
-  top_signals: string[];
-  features: FeatureSnapshot;
-  filename: string;
-};
 
 const SIGNAL_LABELS: Record<string, string> = {
   docstring_ratio: "High docstring coverage across functions",
@@ -151,21 +198,16 @@ export default function ScanPage() {
     setResult(null);
 
     try {
-      const response = await fetch(`${API_URL}/api/v1/scan`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, filename }),
-      });
-
-      if (!response.ok) {
-        const body = await response.json().catch(() => null);
-        throw new Error(body?.detail ?? `Server returned ${response.status}`);
-      }
-
-      const data: ScanResult = await response.json();
+      const data = await fetchScanWithRetry({ code, filename });
       setResult(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Analysis failed");
+      if (err instanceof NonRetryableScanError) {
+        setError(err.message);
+      } else if (err instanceof TypeError) {
+        setError("Unable to reach the CodeSense API. Verify NEXT_PUBLIC_API_URL and try again.");
+      } else {
+        setError(err instanceof Error ? err.message : "Analysis failed. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }

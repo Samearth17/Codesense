@@ -113,6 +113,74 @@ Navigate to [localhost:3000/scan](http://localhost:3000/scan), paste Python code
 docker compose up --build
 ```
 
+
+## Deployment
+
+### Vercel (Frontend)
+
+1. Create a new Vercel project from the GitHub repository.
+2. Set the project root directory to `frontend`.
+3. Set the build command to `npm run build` and the output directory to `.next`.
+4. Add the environment variable `NEXT_PUBLIC_API_URL` with the deployed Render backend URL, for example `https://codesense-api.onrender.com`.
+5. Deploy the project and note the generated Vercel URL.
+6. If you use the root `vercel.json`, create a Vercel environment variable named `next-public-api-url` and point it to the same backend URL.
+
+### Render (Backend)
+
+1. Create a new Render Web Service from the GitHub repository.
+2. Set the root directory to `backend`.
+3. Use Python 3.12+.
+4. Build with `uv sync --frozen`.
+5. Start with `uv run uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
+6. Add the backend environment variables listed below.
+7. Confirm model artifacts under `ml/models` are available to the deployed service.
+
+### CORS Configuration
+
+Set `BACKEND_CORS_ORIGINS` to a JSON array containing every allowed frontend origin:
+
+```bash
+BACKEND_CORS_ORIGINS=["https://your-vercel-app.vercel.app","https://codesense.example.com"]
+```
+
+For local development, include `http://localhost:3000`. Do not use `*` with credentials in production.
+
+### Environment Variables
+
+Frontend (Vercel):
+
+```bash
+NEXT_PUBLIC_API_URL=https://codesense-api.onrender.com
+NEXT_PUBLIC_APP_NAME=CodeSense
+```
+
+Backend (Render):
+
+```bash
+APP_NAME=CodeSense API
+APP_ENV=production
+APP_DEBUG=false
+API_V1_PREFIX=/api/v1
+BACKEND_CORS_ORIGINS=["https://your-vercel-app.vercel.app"]
+LOG_LEVEL=INFO
+```
+
+### Health Check
+
+1. Backend: open `https://<render-service>/health` and verify `{"status":"ok","service":"codesense-backend"}`.
+2. Frontend: open `https://<vercel-app>/scan`.
+3. Paste a small Python function and click **Analyze**.
+4. If the frontend cannot reach the backend, verify `NEXT_PUBLIC_API_URL` and `BACKEND_CORS_ORIGINS` match the deployed URLs exactly.
+
+## Troubleshooting
+
+- **Frontend shows API connection errors:** Confirm `NEXT_PUBLIC_API_URL` is set in Vercel and points to the Render service without a trailing `/api/v1`.
+- **Browser CORS error:** Add the exact Vercel origin to `BACKEND_CORS_ORIGINS` and redeploy the backend.
+- **Backend returns model unavailable:** Confirm `ml/models/codesense_xgb.json` and `ml/models/model_meta.json` are present in the deployed image/service.
+- **Validation error for pasted code:** CodeSense currently expects valid Python syntax. Check the line number returned by the API error.
+- **Render cold starts:** The model is loaded during FastAPI lifespan startup; the first request after an idle period can still be slower while Render wakes the service.
+- **Docker Compose env errors:** Create `frontend/.env` and `backend/.env` from the provided examples before running `docker compose up --build`.
+
 ## API
 
 ### `POST /api/v1/scan`

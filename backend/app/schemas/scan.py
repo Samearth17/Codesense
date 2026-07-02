@@ -1,13 +1,37 @@
 """Request and response contracts for the code-scan endpoint."""
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class ScanRequest(BaseModel):
     """Payload for a code-authorship scan."""
 
-    code: str = Field(..., min_length=1, max_length=500_000, description="Python source code to analyze.")
-    filename: str = Field(default="unnamed.py", description="Optional filename for context.")
+    code: str = Field(
+        ...,
+        min_length=1,
+        max_length=500_000,
+        description="Python source code to analyze.",
+    )
+    filename: str = Field(
+        default="unnamed.py",
+        min_length=1,
+        max_length=255,
+        description="Optional filename for context.",
+    )
+
+    @field_validator("code")
+    @classmethod
+    def code_must_not_be_blank(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("Code must contain at least one non-whitespace character.")
+        return value
+
+    @field_validator("filename")
+    @classmethod
+    def filename_must_not_be_blank(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("Filename must contain at least one non-whitespace character.")
+        return value
 
 
 class FeatureSnapshot(BaseModel):
@@ -29,6 +53,12 @@ class ScanResponse(BaseModel):
     label: str = Field(..., description="'ai' or 'human'.")
     confidence: float = Field(..., ge=0, le=1, description="Confidence in the predicted label.")
     is_ai: bool = Field(..., description="True when the prediction is AI-authored.")
-    top_signals: list[str] = Field(..., description="Up to 3 feature names that most influenced the prediction.")
-    features: FeatureSnapshot = Field(..., description="Key code metrics extracted during analysis.")
+    top_signals: list[str] = Field(
+        ...,
+        description="Up to 3 feature names that most influenced the prediction.",
+    )
+    features: FeatureSnapshot = Field(
+        ...,
+        description="Key code metrics extracted during analysis.",
+    )
     filename: str
