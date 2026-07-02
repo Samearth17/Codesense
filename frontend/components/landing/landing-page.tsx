@@ -27,7 +27,6 @@ import {
   MetricCard,
   SectionContainer,
   SectionHeading,
-  Tooltip,
 } from "@/components/ui";
 import {
   accentPalette,
@@ -145,21 +144,19 @@ function SiteNav() {
           <NavLink href="#features">Features</NavLink>
           <NavLink href="#docs">Docs</NavLink>
           <NavLink
-            href="https://github.com"
+            href="https://github.com/Samearth17/Codesense"
             icon={<Github className="size-4" aria-hidden="true" />}
           >
             GitHub
           </NavLink>
         </div>
 
-        <Tooltip content="Static landing-page action. Analysis workflow comes later.">
-          <Button asChild size="sm" className="h-9">
-            <a href="#analyze">
-              Analyze
-              <ArrowRight className="size-4" aria-hidden="true" />
-            </a>
-          </Button>
-        </Tooltip>
+        <Button asChild size="sm" className="h-9">
+          <a href="/scan">
+            Analyze
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </a>
+        </Button>
       </nav>
     </header>
   );
@@ -257,7 +254,7 @@ function Hero() {
           className="mt-9 flex flex-col gap-3 sm:flex-row"
         >
           <Button asChild size="lg">
-            <a href="#analyze">
+            <a href="/scan">
               Analyze Code
               <ArrowRight className="size-4" aria-hidden="true" />
             </a>
@@ -390,7 +387,7 @@ function FeatureCard({
       }}
       className="rounded-lg border border-line-subtle bg-white/[0.035] p-5 transition-colors duration-base ease-premium hover:bg-white/[0.055]"
     >
-      <Icon className={cn("size-5", palette.icon)} aria-hidden="true" />
+      <Icon className={cn("size-5", palette.icon)} aria-hidden={true} />
       <h3 className={cn("mt-5 text-foreground", typography.label)}>
         {feature.title}
       </h3>
@@ -440,7 +437,7 @@ function StepCard({
       className="relative rounded-lg border border-line-subtle bg-surface p-6"
     >
       <div className="flex size-10 items-center justify-center rounded-md border border-line-subtle bg-white/[0.04] text-cyan-200">
-        <Icon className="size-5" aria-hidden="true" />
+        <Icon className="size-5" aria-hidden={true} />
       </div>
       <p className="mt-6 text-sm text-muted-foreground">0{index + 1}</p>
       <h3 className={cn("mt-2 text-foreground", typography.h3)}>
@@ -465,7 +462,7 @@ function SiteFooter() {
         <div className="flex flex-wrap gap-x-5 gap-y-2">
           <FooterLink href="#features">Features</FooterLink>
           <FooterLink href="#docs">Docs</FooterLink>
-          <FooterLink href="https://github.com">GitHub</FooterLink>
+          <FooterLink href="https://github.com/Samearth17/Codesense">GitHub</FooterLink>
         </div>
       </SectionContainer>
     </footer>

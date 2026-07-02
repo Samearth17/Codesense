@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
-api_router = APIRouter()
+from app.api.scan import router as scan_router
 
-# Feature routers will be included here as product capabilities are introduced.
+api_router = APIRouter()
+api_router.include_router(scan_router)
