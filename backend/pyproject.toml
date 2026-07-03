@@ -35,3 +35,7 @@ ignore = []
 testpaths = ["tests"]
 asyncio_mode = "auto"
 pythonpath = ["."]
+
+[tool.ruff.lint.isort]
+  known-first-party = ["app", "ml"]
+  known-third-party = ["fastapi", "pydantic", "pytest", "structlog", ...]
