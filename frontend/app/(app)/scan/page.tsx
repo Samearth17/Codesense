@@ -134,8 +134,10 @@ def is_prime(num: int) -> bool:
 
 const SIGNAL_LABELS: Record<string, string> = {
   docstring_ratio: "High docstring coverage across functions",
-  type_annotation_ratio: "Consistent type annotations on parameters and returns",
-  maintainability_index: "Elevated maintainability score (structured, clean code)",
+  type_annotation_ratio:
+    "Consistent type annotations on parameters and returns",
+  maintainability_index:
+    "Elevated maintainability score (structured, clean code)",
   avg_identifier_length: "Long, descriptive identifier names",
   single_char_var_ratio: "Very few single-character variable names",
   comment_density: "High inline comment density",
@@ -313,10 +315,7 @@ export default function ScanPage() {
               {/* Editor header */}
               <div className="flex items-center justify-between border-b border-line-subtle px-4 py-3">
                 <div className="flex items-center gap-3">
-                  <div
-                    className="flex items-center gap-1.5"
-                    aria-hidden="true"
-                  >
+                  <div className="flex items-center gap-1.5" aria-hidden="true">
                     <span className="size-2.5 rounded-full bg-rose-400" />
                     <span className="size-2.5 rounded-full bg-amber-300" />
                     <span className="size-2.5 rounded-full bg-emerald-300" />
@@ -460,7 +459,9 @@ function ErrorPanel({ message }: { message: string }) {
       className="flex min-h-[460px] flex-col items-center justify-center rounded-lg border border-rose-400/20 bg-rose-400/5 p-8 text-center"
     >
       <AlertTriangle className="size-8 text-rose-400" aria-hidden />
-      <p className="mt-4 text-sm font-medium text-foreground">Analysis failed</p>
+      <p className="mt-4 text-sm font-medium text-foreground">
+        Analysis failed
+      </p>
       <p className="mt-2 max-w-xs text-sm text-muted-foreground">{message}</p>
     </motion.div>
   );
@@ -514,7 +515,7 @@ function ResultsPanel({ result }: { result: ScanResult }) {
             {isAI ? "Likely AI-assisted code" : "Likely human-written code"}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {result.filename} \u00b7 {confidencePct}% confidence
+            {result.filename} · {confidencePct}% confidence
           </p>
         </div>
         <Badge variant={isAI ? "violet" : "emerald"}>
