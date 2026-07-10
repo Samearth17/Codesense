@@ -6,5 +6,8 @@ export { EmptyState } from "@/components/ui/empty-state";
 export { EvidenceCard } from "@/components/ui/evidence-card";
 export { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 export { MetricCard } from "@/components/ui/metric-card";
-export { SectionContainer, SectionHeading } from "@/components/ui/section-container";
+export {
+  SectionContainer,
+  SectionHeading,
+} from "@/components/ui/section-container";
 export { Tooltip } from "@/components/ui/tooltip";

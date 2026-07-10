@@ -238,7 +238,10 @@ function Hero() {
             duration: motionTokens.duration.slow,
             ease: motionTokens.ease,
           }}
-          className={cn("mt-6 max-w-2xl text-muted-foreground", typography.bodyLarge)}
+          className={cn(
+            "mt-6 max-w-2xl text-muted-foreground",
+            typography.bodyLarge,
+          )}
         >
           CodeSense estimates AI-assisted authorship using explainable static
           analysis and machine learning, giving engineering teams evidence they
@@ -356,7 +359,9 @@ function FeaturesSection() {
         title="Built for evidence, not vibes."
         description="CodeSense is designed around inspectable signals, clean reporting, and a workflow that respects source-code privacy."
       />
-      <div className={cn("grid gap-4 sm:grid-cols-2 lg:grid-cols-4", spacing.sectionGap)}>
+      <div
+        className={cn("grid gap-4 sm:grid-cols-2 lg:grid-cols-4", spacing.sectionGap)}
+      >
         {features.map((feature, index) => (
           <FeatureCard key={feature.title} feature={feature} index={index} />
         ))}
@@ -462,7 +467,9 @@ function SiteFooter() {
         <div className="flex flex-wrap gap-x-5 gap-y-2">
           <FooterLink href="#features">Features</FooterLink>
           <FooterLink href="#docs">Docs</FooterLink>
-          <FooterLink href="https://github.com/Samearth17/Codesense">GitHub</FooterLink>
+          <FooterLink href="https://github.com/Samearth17/Codesense">
+            GitHub
+          </FooterLink>
         </div>
       </SectionContainer>
     </footer>

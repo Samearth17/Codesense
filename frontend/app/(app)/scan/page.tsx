@@ -23,7 +23,12 @@ import {
   EvidenceCard,
   MetricCard,
 } from "@/components/ui";
-import { motionTokens, spacing, typography, type Accent } from "@/lib/design-tokens";
+import {
+  motionTokens,
+  spacing,
+  typography,
+  type Accent,
+} from "@/lib/design-tokens";
 import type { FeatureSnapshot, ScanRequest, ScanResult } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -35,7 +40,8 @@ class NonRetryableScanError extends Error {}
 
 function getApiUrl() {
   if (typeof window !== "undefined") {
-    const runtimeApiUrl = window.__CODESENSE_CONFIG__?.NEXT_PUBLIC_API_URL?.trim();
+    const runtimeApiUrl =
+      window.__CODESENSE_CONFIG__?.NEXT_PUBLIC_API_URL?.trim();
     if (runtimeApiUrl) return runtimeApiUrl;
   }
 
@@ -91,7 +97,8 @@ async function fetchScanWithRetry(request: ScanRequest): Promise<ScanResult> {
   }
 
   throw new Error(
-    lastError?.message || "The backend is unavailable. Check your API URL and try again.",
+    lastError?.message ||
+      "The backend is unavailable. Check your API URL and try again.",
   );
 }
 
@@ -204,9 +211,13 @@ export default function ScanPage() {
       if (err instanceof NonRetryableScanError) {
         setError(err.message);
       } else if (err instanceof TypeError) {
-        setError("Unable to reach the CodeSense API. Verify NEXT_PUBLIC_API_URL and try again.");
+        setError(
+          "Unable to reach the CodeSense API. Verify NEXT_PUBLIC_API_URL and try again.",
+        );
       } else {
-        setError(err instanceof Error ? err.message : "Analysis failed. Please try again.");
+        setError(
+          err instanceof Error ? err.message : "Analysis failed. Please try again.",
+        );
       }
     } finally {
       setIsLoading(false);
@@ -265,15 +276,15 @@ export default function ScanPage() {
 
       {/* Content */}
       <div
-        className={cn(
-          "mx-auto max-w-7xl py-10 lg:py-14",
-          spacing.pageX,
-        )}
+        className={cn("mx-auto max-w-7xl py-10 lg:py-14", spacing.pageX)}
       >
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: motionTokens.duration.slow, ease: motionTokens.ease }}
+          transition={{
+            duration: motionTokens.duration.slow,
+            ease: motionTokens.ease,
+          }}
         >
           <h1 className={cn("text-foreground", typography.h2)}>
             Analyze Code Authorship
@@ -358,7 +369,9 @@ export default function ScanPage() {
               </Button>
               <span className="text-xs text-muted-foreground">
                 {code.length > 0
-                  ? `${code.split("\n").length} lines · ${(code.length / 1024).toFixed(1)} KB`
+                  ? `${code.split("\n").length} lines · ${
+                      (code.length / 1024).toFixed(1)
+                    } KB`
                   : "No code entered"}
               </span>
             </div>
@@ -415,7 +428,10 @@ function EmptyPanel({ isLoading }: { isLoading: boolean }) {
       ) : (
         <>
           <div className="flex size-14 items-center justify-center rounded-xl border border-line-subtle bg-white/[0.03]">
-            <BrainCircuit className="size-7 text-muted-foreground/50" aria-hidden />
+            <BrainCircuit
+              className="size-7 text-muted-foreground/50"
+              aria-hidden
+            />
           </div>
           <p className="mt-5 text-sm font-medium text-foreground">
             Paste code to begin
@@ -491,9 +507,7 @@ function ResultsPanel({ result }: { result: ScanResult }) {
         )}
         <div className="flex-1">
           <p className="text-sm font-medium text-foreground">
-            {isAI
-              ? "Likely AI-assisted code"
-              : "Likely human-written code"}
+            {isAI ? "Likely AI-assisted code" : "Likely human-written code"}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
             {result.filename} · {confidencePct}% confidence
