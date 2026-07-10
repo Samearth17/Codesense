@@ -89,7 +89,8 @@ async function fetchScanWithRetry(request: ScanRequest): Promise<ScanResult> {
     } catch (err) {
       if (err instanceof NonRetryableScanError) throw err;
 
-      lastError = err instanceof Error ? err : new Error("Analysis request failed");
+      lastError =
+        err instanceof Error ? err : new Error("Analysis request failed");
       if (attempt === MAX_SCAN_RETRIES) break;
 
       await wait(RETRY_BASE_DELAY_MS * 2 ** attempt);
@@ -216,7 +217,9 @@ export default function ScanPage() {
         );
       } else {
         setError(
-          err instanceof Error ? err.message : "Analysis failed. Please try again.",
+          err instanceof Error
+            ? err.message
+            : "Analysis failed. Please try again.",
         );
       }
     } finally {
@@ -275,9 +278,7 @@ export default function ScanPage() {
       </header>
 
       {/* Content */}
-      <div
-        className={cn("mx-auto max-w-7xl py-10 lg:py-14", spacing.pageX)}
-      >
+      <div className={cn("mx-auto max-w-7xl py-10 lg:py-14", spacing.pageX)}>
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
@@ -312,7 +313,10 @@ export default function ScanPage() {
               {/* Editor header */}
               <div className="flex items-center justify-between border-b border-line-subtle px-4 py-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1.5" aria-hidden="true">
+                  <div
+                    className="flex items-center gap-1.5"
+                    aria-hidden="true"
+                  >
                     <span className="size-2.5 rounded-full bg-rose-400" />
                     <span className="size-2.5 rounded-full bg-amber-300" />
                     <span className="size-2.5 rounded-full bg-emerald-300" />
@@ -369,7 +373,7 @@ export default function ScanPage() {
               </Button>
               <span className="text-xs text-muted-foreground">
                 {code.length > 0
-                  ? `${code.split("\n").length} lines · ${
+                  ? `${code.split("\n").length} lines \u00b7 ${
                       (code.length / 1024).toFixed(1)
                     } KB`
                   : "No code entered"}
@@ -510,7 +514,7 @@ function ResultsPanel({ result }: { result: ScanResult }) {
             {isAI ? "Likely AI-assisted code" : "Likely human-written code"}
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {result.filename} · {confidencePct}% confidence
+            {result.filename} \u00b7 {confidencePct}% confidence
           </p>
         </div>
         <Badge variant={isAI ? "violet" : "emerald"}>

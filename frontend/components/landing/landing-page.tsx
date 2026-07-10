@@ -360,7 +360,10 @@ function FeaturesSection() {
         description="CodeSense is designed around inspectable signals, clean reporting, and a workflow that respects source-code privacy."
       />
       <div
-        className={cn("grid gap-4 sm:grid-cols-2 lg:grid-cols-4", spacing.sectionGap)}
+        className={cn(
+          "grid gap-4 sm:grid-cols-2 lg:grid-cols-4",
+          spacing.sectionGap,
+        )}
       >
         {features.map((feature, index) => (
           <FeatureCard key={feature.title} feature={feature} index={index} />
