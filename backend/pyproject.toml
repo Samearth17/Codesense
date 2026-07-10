@@ -38,4 +38,4 @@ pythonpath = ["."]
 
 [tool.ruff.lint.isort]
   known-first-party = ["app", "ml"]
-  known-third-party = ["fastapi", "pydantic", "pytest", "structlog", ...]
+  known-third-party = ["fastapi", "pydantic", "pytest", "structlog", "xgboost", "numpy", "sklearn", "radon", "uvicorn"]
