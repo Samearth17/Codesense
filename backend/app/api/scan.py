@@ -31,8 +31,7 @@ def _raise_model_unavailable(exc: FileNotFoundError, filename: str | None = None
         status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         detail={
             "message": (
-                "CodeSense model artifacts are unavailable. "
-                "Please retry after deployment is fixed."
+                "CodeSense model artifacts are unavailable. Please retry after deployment is fixed."
             ),
             "type": "model_unavailable",
         },

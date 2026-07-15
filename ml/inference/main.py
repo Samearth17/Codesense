@@ -1,17 +1,20 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from .schemas import PredictRequest, PredictResponse, FeatureSnapshot
-from .predictor import get_predictor, CodeSensePredictor
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+
+from .predictor import CodeSensePredictor, get_predictor
+from .schemas import FeatureSnapshot, PredictRequest, PredictResponse
 
 predictor: CodeSensePredictor = None
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global predictor
     predictor = get_predictor()
     yield
+
 
 app = FastAPI(
     title="CodeSense API",
@@ -31,9 +34,9 @@ app.add_middleware(
 @app.get("/")
 def root():
     return {
-        "service" : "CodeSense",
-        "version" : "1.0.0",
-        "status"  : "running",
+        "service": "CodeSense",
+        "version": "1.0.0",
+        "status": "running",
         "endpoints": ["/predict", "/health", "/docs"],
     }
 
@@ -53,12 +56,12 @@ def predict(request: PredictRequest):
     try:
         result = predictor.predict(request.code, request.filename)
         return PredictResponse(
-            label       = result["label"],
-            confidence  = result["confidence"],
-            is_ai       = result["is_ai"],
-            top_signals = result["top_signals"],
-            filename    = result["filename"],
-            features    = FeatureSnapshot(**result["features"]),
+            label=result["label"],
+            confidence=result["confidence"],
+            is_ai=result["is_ai"],
+            top_signals=result["top_signals"],
+            filename=result["filename"],
+            features=FeatureSnapshot(**result["features"]),
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

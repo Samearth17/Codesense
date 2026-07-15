@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
+
 from ..models import FileRecord
+
 
 def write_manifest(records: list[FileRecord], output_dir: Path) -> None:
     data = [r.model_dump() for r in records]

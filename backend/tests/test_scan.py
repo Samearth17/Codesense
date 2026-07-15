@@ -27,7 +27,7 @@ def test_scan_endpoint_valid_human_code(client: TestClient) -> None:
     response = client.post("/api/v1/scan", json={"code": code, "filename": "add.py"})
     assert response.status_code == 200
     data = response.json()
-    
+
     # Validate structure using schemas
     validated = ScanResponse(**data)
     assert validated.filename == "add.py"

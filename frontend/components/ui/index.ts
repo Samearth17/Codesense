@@ -11,3 +11,9 @@ export {
   SectionHeading,
 } from "@/components/ui/section-container";
 export { Tooltip } from "@/components/ui/tooltip";
+export { AnimatedCard } from "@/components/ui/animated-card";
+export { AnimatedButton } from "@/components/ui/animated-button";
+export { AnimatedBadge } from "@/components/ui/animated-badge";
+export { AnimatedText } from "@/components/ui/animated-text";
+export { AnimatedLoader } from "@/components/ui/animated-loader";
+export { AnimatedContainer } from "@/components/ui/animated-container";

@@ -1,5 +1,6 @@
 from ..models import FileRecord
 
+
 def deduplicate(records: list[FileRecord]) -> list[FileRecord]:
     seen: set[str] = set()
     unique = []

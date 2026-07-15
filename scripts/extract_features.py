@@ -1,4 +1,6 @@
-import sys, json, csv
+import csv
+import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -7,14 +9,16 @@ sys.path.insert(0, str(ROOT / "ml"))
 from feature_extractors.extractor import extract_features
 
 HUMAN_DIR = ROOT / "datasets" / "human"
-AI_DIR    = ROOT / "datasets" / "ai"
-OUTPUT    = ROOT / "datasets" / "features.csv"
+AI_DIR = ROOT / "datasets" / "ai"
+OUTPUT = ROOT / "datasets" / "features.csv"
 
 human_records = json.loads((HUMAN_DIR / "metadata.json").read_text())
-ai_records    = json.loads((AI_DIR    / "metadata.json").read_text())
-all_records   = human_records + ai_records
+ai_records = json.loads((AI_DIR / "metadata.json").read_text())
+all_records = human_records + ai_records
 
-print(f"Human: {len(human_records)} | AI: {len(ai_records)} | Total: {len(all_records)}")
+print(
+    f"Human: {len(human_records)} | AI: {len(ai_records)} | Total: {len(all_records)}"
+)
 
 rows = []
 errors = 0
@@ -49,7 +53,7 @@ if rows:
         writer.writeheader()
         writer.writerows(rows)
 
-print(f"\n✓ features.csv written")
+print("\n✓ features.csv written")
 print(f"  Rows     : {len(rows)}")
 print(f"  Features : {len(fieldnames) - 1}")
 print(f"  Errors   : {errors}")

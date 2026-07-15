@@ -9,13 +9,19 @@ SEED_REPOS = [
 ]
 
 IGNORE_DIRS = {
-    ".git", "__pycache__", "node_modules", "build",
-    "dist", "venv", ".tox", "tests", "test", "docs"
+    ".git",
+    "__pycache__",
+    "node_modules",
+    "build",
+    "dist",
+    "venv",
+    ".tox",
+    "tests",
+    "test",
+    "docs",
 }
 
-LANGUAGE_MAP = {
-    ".py": "python"
-}
+LANGUAGE_MAP = {".py": "python"}
 
 MIN_LINES = 15
 MAX_LINES = 400

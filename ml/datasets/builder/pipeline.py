@@ -1,21 +1,21 @@
 # ml/datasets/builder/pipeline.py
-import shutil
 from pathlib import Path
-from .config import SEED_REPOS, LANGUAGE_MAP, IGNORE_DIRS, MIN_LINES, MAX_LINES
+
+from .config import IGNORE_DIRS, LANGUAGE_MAP, MAX_LINES, MIN_LINES, SEED_REPOS
 from .models import FileRecord
 from .stages.clone import clone_repo
-from .stages.scan import scan_files
-from .stages.filter import filter_file
-from .stages.hasher import sha256_file
 from .stages.dedup import deduplicate
 from .stages.export import export_files
+from .stages.filter import filter_file
+from .stages.hasher import sha256_file
 from .stages.manifest import write_manifest
+from .stages.scan import scan_files
 
 
 class DatasetPipeline:
     def __init__(self, workspace: Path, output: Path):
         self.workspace = workspace  # tmp clones go here
-        self.output = output        # datasets/human/ goes here
+        self.output = output  # datasets/human/ goes here
         self.workspace.mkdir(parents=True, exist_ok=True)
         self.output.mkdir(parents=True, exist_ok=True)
 

@@ -1,8 +1,10 @@
 from pydantic import BaseModel
 
+
 class PredictRequest(BaseModel):
     code: str
     filename: str = "unnamed.py"
+
 
 class FeatureSnapshot(BaseModel):
     docstring_ratio: float
@@ -13,6 +15,7 @@ class FeatureSnapshot(BaseModel):
     comment_density: float
     blank_line_ratio: float
     avg_cyclomatic_complexity: float
+
 
 class PredictResponse(BaseModel):
     label: str

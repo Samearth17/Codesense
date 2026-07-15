@@ -1,5 +1,7 @@
-import hashlib, json
+import hashlib
+import json
 from pathlib import Path
+
 from datasets import load_dataset
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -23,14 +25,16 @@ for item in ds:
     sha = hashlib.sha256(code.encode()).hexdigest()
     filename = f"ai_sample_{count:04d}.py"
     (OUTPUT_DIR / filename).write_text(code, encoding="utf-8")
-    records.append({
-        "repo": "huggingface/python_code_instructions_18k_alpaca",
-        "language": "python",
-        "relative_path": filename,
-        "lines": len(code.splitlines()),
-        "sha256": sha,
-        "label": "ai"
-    })
+    records.append(
+        {
+            "repo": "huggingface/python_code_instructions_18k_alpaca",
+            "language": "python",
+            "relative_path": filename,
+            "lines": len(code.splitlines()),
+            "sha256": sha,
+            "label": "ai",
+        }
+    )
     count += 1
     if count % 100 == 0:
         print(f"  {count}/600 files saved...")

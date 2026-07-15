@@ -1,30 +1,31 @@
-import sys, json
+import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "ml"))
 
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 import shap
 import xgboost as xgb
-from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
 from sklearn.metrics import (
-    classification_report, confusion_matrix,
-    roc_auc_score, roc_curve, ConfusionMatrixDisplay
+    ConfusionMatrixDisplay,
+    classification_report,
+    confusion_matrix,
+    roc_auc_score,
+    roc_curve,
 )
-from sklearn.preprocessing import LabelEncoder
-import pickle
+from sklearn.model_selection import StratifiedKFold, cross_val_score, train_test_split
 
 # ── Load data ──────────────────────────────────────────────────────
 df = pd.read_csv(ROOT / "datasets" / "features.csv")
-print(f"Dataset: {df.shape[0]} rows × {df.shape[1]-1} features")
+print(f"Dataset: {df.shape[0]} rows × {df.shape[1] - 1} features")
 print(f"Labels : {df['label'].value_counts().to_dict()}")
 
 FEATURES = [c for c in df.columns if c != "label"]
 X = df[FEATURES].values
-y = (df["label"] == "ai").astype(int).values   # 1=AI, 0=human
+y = (df["label"] == "ai").astype(int).values  # 1=AI, 0=human
 
 # ── Train/test split ───────────────────────────────────────────────
 X_train, X_test, y_train, y_test = train_test_split(
@@ -52,18 +53,19 @@ print(f"\n5-Fold CV AUC: {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
 
 # ── Final training ─────────────────────────────────────────────────
 model.fit(
-    X_train, y_train,
+    X_train,
+    y_train,
     eval_set=[(X_test, y_test)],
     verbose=False,
 )
 
 # ── Evaluation ─────────────────────────────────────────────────────
-y_pred  = model.predict(X_test)
+y_pred = model.predict(X_test)
 y_proba = model.predict_proba(X_test)[:, 1]
-auc     = roc_auc_score(y_test, y_proba)
+auc = roc_auc_score(y_test, y_proba)
 
 print(f"\nTest AUC   : {auc:.4f}")
-print(f"\nClassification Report:")
+print("\nClassification Report:")
 print(classification_report(y_test, y_pred, target_names=["human", "ai"]))
 
 # ── Plots ──────────────────────────────────────────────────────────
@@ -73,8 +75,7 @@ PLOTS.mkdir(exist_ok=True)
 # 1. Confusion matrix
 fig, ax = plt.subplots(figsize=(5, 4))
 ConfusionMatrixDisplay(
-    confusion_matrix(y_test, y_pred),
-    display_labels=["Human", "AI"]
+    confusion_matrix(y_test, y_pred), display_labels=["Human", "AI"]
 ).plot(ax=ax, colorbar=False, cmap="Blues")
 ax.set_title("Confusion Matrix")
 plt.tight_layout()
@@ -86,7 +87,7 @@ print("Saved: confusion_matrix.png")
 fpr, tpr, _ = roc_curve(y_test, y_proba)
 fig, ax = plt.subplots(figsize=(5, 4))
 ax.plot(fpr, tpr, lw=2, label=f"AUC = {auc:.3f}")
-ax.plot([0,1],[0,1],"--", color="gray")
+ax.plot([0, 1], [0, 1], "--", color="gray")
 ax.set_xlabel("False Positive Rate")
 ax.set_ylabel("True Positive Rate")
 ax.set_title("ROC Curve")
@@ -111,7 +112,7 @@ plt.close()
 print("Saved: feature_importance.png")
 
 # 4. SHAP summary plot
-explainer   = shap.TreeExplainer(model)
+explainer = shap.TreeExplainer(model)
 shap_values = explainer.shap_values(X_test)
 fig, ax = plt.subplots(figsize=(8, 8))
 shap.summary_plot(shap_values, X_test, feature_names=FEATURES, show=False)
@@ -127,16 +128,16 @@ MODELS.mkdir(exist_ok=True)
 model.save_model(str(MODELS / "codesense_xgb.json"))
 
 meta = {
-    "features"     : FEATURES,
-    "num_features" : len(FEATURES),
-    "cv_auc_mean"  : round(float(cv_scores.mean()), 4),
-    "cv_auc_std"   : round(float(cv_scores.std()),  4),
-    "test_auc"     : round(auc, 4),
-    "train_size"   : len(X_train),
-    "test_size"    : len(X_test),
+    "features": FEATURES,
+    "num_features": len(FEATURES),
+    "cv_auc_mean": round(float(cv_scores.mean()), 4),
+    "cv_auc_std": round(float(cv_scores.std()), 4),
+    "test_auc": round(auc, 4),
+    "train_size": len(X_train),
+    "test_size": len(X_test),
 }
 (MODELS / "model_meta.json").write_text(json.dumps(meta, indent=2))
 
-print(f"\n✓ Model saved  → ml/models/codesense_xgb.json")
-print(f"✓ Meta saved   → ml/models/model_meta.json")
-print(f"✓ Plots saved  → ml/plots/")
+print("\n✓ Model saved  → ml/models/codesense_xgb.json")
+print("✓ Meta saved   → ml/models/model_meta.json")
+print("✓ Plots saved  → ml/plots/")

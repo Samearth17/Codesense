@@ -3,6 +3,7 @@ import ast
 try:
     import radon.complexity as radon_cc
     import radon.metrics as radon_mi
+
     HAS_RADON = True
 except ImportError:
     HAS_RADON = False
@@ -16,20 +17,14 @@ def extract_features(code: str) -> dict:
 
     # ── TIER 1: Formatting ──────────────────────────────────────────
     features["total_lines"] = len(lines)
-    features["blank_line_ratio"] = round(
-        (len(lines) - len(non_empty)) / max(len(lines), 1), 4
-    )
-    features["avg_line_length"] = round(
-        sum(len(l) for l in non_empty) / max(len(non_empty), 1), 2
-    )
+    features["blank_line_ratio"] = round((len(lines) - len(non_empty)) / max(len(lines), 1), 4)
+    features["avg_line_length"] = round(sum(len(l) for l in non_empty) / max(len(non_empty), 1), 2)
     features["long_line_ratio"] = round(
         sum(1 for l in lines if len(l) > 79) / max(len(lines), 1), 4
     )
 
     # ── TIER 1: Comments ────────────────────────────────────────────
-    features["comment_density"] = round(
-        len(comment_lines) / max(len(non_empty), 1), 4
-    )
+    features["comment_density"] = round(len(comment_lines) / max(len(non_empty), 1), 4)
 
     # ── AST BLOCK ───────────────────────────────────────────────────
     try:
@@ -56,22 +51,15 @@ def extract_features(code: str) -> dict:
         func_lengths = []
         for f in functions:
             start = f.lineno
-            end = max(
-                (getattr(n, "lineno", start) for n in ast.walk(f)),
-                default=start
-            )
+            end = max((getattr(n, "lineno", start) for n in ast.walk(f)), default=start)
             func_lengths.append(end - start + 1)
 
-        features["avg_function_length"] = round(
-            sum(func_lengths) / max(len(func_lengths), 1), 2
-        )
+        features["avg_function_length"] = round(sum(func_lengths) / max(len(func_lengths), 1), 2)
         features["max_function_length"] = max(func_lengths) if func_lengths else 0
 
         # ── TIER 1: Docstring ratio ──────────────────────────────────
         docstrings = sum(1 for f in functions if ast.get_docstring(f))
-        features["docstring_ratio"] = round(
-            docstrings / max(len(functions), 1), 4
-        )
+        features["docstring_ratio"] = round(docstrings / max(len(functions), 1), 4)
 
         # ── TIER 1: Naming ───────────────────────────────────────────
         names = [n.id for n in ast.walk(tree) if isinstance(n, ast.Name)]
@@ -83,17 +71,13 @@ def extract_features(code: str) -> dict:
         )
 
         # ── TIER 2: Type annotations ─────────────────────────────────
-        annotated = sum(
-            1 for f in functions
-            if f.returns or any(a.annotation for a in f.args.args)
-        )
-        features["type_annotation_ratio"] = round(
-            annotated / max(len(functions), 1), 4
-        )
+        annotated = sum(1 for f in functions if f.returns or any(a.annotation for a in f.args.args))
+        features["type_annotation_ratio"] = round(annotated / max(len(functions), 1), 4)
 
         # ── TIER 3: Magic numbers ────────────────────────────────────
         magic_numbers = [
-            n for n in ast.walk(tree)
+            n
+            for n in ast.walk(tree)
             if isinstance(n, ast.Constant)
             and isinstance(n.value, (int, float))
             and n.value not in (0, 1, -1, 2, True, False)
@@ -112,11 +96,21 @@ def extract_features(code: str) -> dict:
 
     except SyntaxError:
         for key in [
-            "num_functions", "num_classes", "num_loops", "num_conditionals",
-            "num_try_except", "import_count", "assertion_count",
-            "avg_function_length", "max_function_length", "docstring_ratio",
-            "avg_identifier_length", "single_char_var_ratio",
-            "type_annotation_ratio", "magic_number_count", "nested_function_count",
+            "num_functions",
+            "num_classes",
+            "num_loops",
+            "num_conditionals",
+            "num_try_except",
+            "import_count",
+            "assertion_count",
+            "avg_function_length",
+            "max_function_length",
+            "docstring_ratio",
+            "avg_identifier_length",
+            "single_char_var_ratio",
+            "type_annotation_ratio",
+            "magic_number_count",
+            "nested_function_count",
         ]:
             features[key] = 0
         features["ast_parse_success"] = 0
@@ -130,9 +124,7 @@ def extract_features(code: str) -> dict:
                 sum(complexities) / max(len(complexities), 1), 2
             )
             features["max_cyclomatic_complexity"] = max(complexities) if complexities else 0
-            features["maintainability_index"] = round(
-                radon_mi.mi_visit(code, multi=True), 2
-            )
+            features["maintainability_index"] = round(radon_mi.mi_visit(code, multi=True), 2)
         except Exception:
             features["avg_cyclomatic_complexity"] = 0
             features["max_cyclomatic_complexity"] = 0

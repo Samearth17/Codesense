@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 def scan_files(repo_path: Path, ignore_dirs: set, extensions: set) -> list[Path]:
     results = []
     for path in repo_path.rglob("*"):

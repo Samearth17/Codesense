@@ -1,18 +1,17 @@
-import sys
 import json
+import sys
 from pathlib import Path
+
 import typer
-from rich.console import Console
+from rich import box
+from rich.console import Console, Group
 from rich.panel import Panel
 from rich.table import Table
-from rich import box
 from rich.text import Text
-from rich.console import Group
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "ml"))
 
-from feature_extractors.extractor import extract_features
 from inference.predictor import get_predictor
 
 cli = typer.Typer(
@@ -25,34 +24,43 @@ SUPPORTED = {".py"}
 
 
 def _verdict_panel(result: dict, path: str) -> Panel:
-    label      = result["label"]
+    result["label"]
     confidence = result["confidence"]
-    is_ai      = result["is_ai"]
-    signals    = result["top_signals"]
-    feats      = result["features"]
+    is_ai = result["is_ai"]
+    signals = result["top_signals"]
+    feats = result["features"]
 
-    verdict = Text("🤖  AI GENERATED", style="bold red") if is_ai else Text("✅  HUMAN WRITTEN", style="bold green")
-    pct     = f"{confidence * 100:.1f}%"
+    verdict = (
+        Text("🤖  AI GENERATED", style="bold red")
+        if is_ai
+        else Text("✅  HUMAN WRITTEN", style="bold green")
+    )
+    pct = f"{confidence * 100:.1f}%"
 
     table = Table(box=box.SIMPLE, show_header=True, header_style="bold cyan")
-    table.add_column("Feature",  style="dim")
-    table.add_column("Value",    justify="right")
+    table.add_column("Feature", style="dim")
+    table.add_column("Value", justify="right")
 
-    table.add_row("Docstring ratio",       f"{feats['docstring_ratio']:.2f}")
+    table.add_row("Docstring ratio", f"{feats['docstring_ratio']:.2f}")
     table.add_row("Type annotation ratio", f"{feats['type_annotation_ratio']:.2f}")
     table.add_row("Maintainability index", f"{feats['maintainability_index']:.1f}")
     table.add_row("Avg identifier length", f"{feats['avg_identifier_length']:.1f}")
     table.add_row("Single char var ratio", f"{feats['single_char_var_ratio']:.2f}")
-    table.add_row("Comment density",       f"{feats['comment_density']:.2f}")
+    table.add_row("Comment density", f"{feats['comment_density']:.2f}")
     table.add_row("Cyclomatic complexity", f"{feats['avg_cyclomatic_complexity']:.1f}")
 
     signals_str = ", ".join(signals) if signals else "—"
 
     content = Text.assemble(
-        ("File       : ", "bold"), (f"{path}\n",        ""),
-        ("Verdict    : ", "bold"), verdict,              "\n",
-        ("Confidence : ", "bold"), (f"{pct}\n",          "yellow"),
-        ("Top signals: ", "bold"), (f"{signals_str}\n\n","magenta"),
+        ("File       : ", "bold"),
+        (f"{path}\n", ""),
+        ("Verdict    : ", "bold"),
+        verdict,
+        "\n",
+        ("Confidence : ", "bold"),
+        (f"{pct}\n", "yellow"),
+        ("Top signals: ", "bold"),
+        (f"{signals_str}\n\n", "magenta"),
     )
 
     return Panel(
@@ -66,21 +74,25 @@ def _verdict_panel(result: dict, path: str) -> Panel:
 @cli.command()
 def scan(
     path: Path = typer.Argument(..., help="Python file or directory to scan"),
-    recursive: bool  = typer.Option(False, "--recursive", "-r", help="Scan directory recursively"),
-    json_output: bool = typer.Option(False, "--json",      "-j", help="Output raw JSON"),
-    min_confidence: float = typer.Option(0.0, "--min-confidence", help="Only show results above this threshold (0.0-1.0)"),
+    recursive: bool = typer.Option(
+        False, "--recursive", "-r", help="Scan directory recursively"
+    ),
+    json_output: bool = typer.Option(False, "--json", "-j", help="Output raw JSON"),
+    min_confidence: float = typer.Option(
+        0.0, "--min-confidence", help="Only show results above this threshold (0.0-1.0)"
+    ),
 ):
     """Scan a Python file or directory for AI-generated code."""
 
     predictor = get_predictor()
-    console   = Console()
+    console = Console()
 
     # Collect files
     if path.is_file():
         files = [path] if path.suffix in SUPPORTED else []
     elif path.is_dir():
         pattern = "**/*.py" if recursive else "*.py"
-        files   = list(path.glob(pattern))
+        files = list(path.glob(pattern))
     else:
         typer.echo(f"❌ Path not found: {path}", err=True)
         raise typer.Exit(1)
@@ -92,7 +104,7 @@ def scan(
     results = []
     for f in files:
         try:
-            code   = f.read_text(errors="ignore")
+            code = f.read_text(errors="ignore")
             result = predictor.predict(code, filename=f.name)
             result["path"] = str(f)
             results.append(result)
@@ -123,12 +135,12 @@ def scan(
         header_style="bold cyan",
         show_lines=True,
     )
-    table.add_column("File",       style="dim", max_width=60)
-    table.add_column("Verdict",    justify="center")
+    table.add_column("File", style="dim", max_width=60)
+    table.add_column("Verdict", justify="center")
     table.add_column("Confidence", justify="right")
     table.add_column("Top Signal", style="magenta")
 
-    ai_count    = 0
+    ai_count = 0
     human_count = 0
 
     for r in results:
@@ -142,7 +154,7 @@ def scan(
         table.add_row(
             r["path"],
             verdict,
-            f"{r['confidence']*100:.1f}%",
+            f"{r['confidence'] * 100:.1f}%",
             r["top_signals"][0] if r["top_signals"] else "—",
         )
 

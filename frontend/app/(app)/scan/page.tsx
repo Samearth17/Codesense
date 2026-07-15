@@ -372,9 +372,9 @@ export default function ScanPage() {
               </Button>
               <span className="text-xs text-muted-foreground">
                 {code.length > 0
-                  ? `${code.split("\n").length} lines \u00b7 ${
-                      (code.length / 1024).toFixed(1)
-                    } KB`
+                  ? `${code.split("\n").length} lines \u00b7 ${(
+                      code.length / 1024
+                    ).toFixed(1)} KB`
                   : "No code entered"}
               </span>
             </div>

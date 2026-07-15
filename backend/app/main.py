@@ -38,6 +38,7 @@ def create_app() -> FastAPI:
             allow_methods=["*"],
             allow_headers=["*"],
         )
+
     @app.middleware("http")
     async def log_http_requests(request: Request, call_next):
         start_time = perf_counter()
