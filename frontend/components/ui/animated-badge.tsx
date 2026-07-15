@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, HTMLMotionProps } from "framer-motion";
 import { Badge, type BadgeProps } from "./badge";
 import { pulse, glowPulse } from "@/lib/animations";
 
@@ -22,12 +22,11 @@ export const AnimatedBadge = React.forwardRef<
 
   return (
     <motion.div
-      ref={ref}
       animate="animate"
       variants={variants}
       style={{ display: "inline-block" }}
     >
-      <Badge {...props} />
+      <Badge ref={ref} {...props} />
     </motion.div>
   );
 });

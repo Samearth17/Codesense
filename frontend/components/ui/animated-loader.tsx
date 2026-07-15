@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { spin, spinSlow, pulse, bounce } from "@/lib/animations";
+import { spin, pulse, bounce } from "@/lib/animations";
 
-interface AnimatedLoaderProps extends React.HTMLAttributes<HTMLDivElement> {
+interface AnimatedLoaderProps extends HTMLMotionProps<"div"> {
   type?: "spin" | "pulse" | "bounce" | "dots";
   size?: "sm" | "md" | "lg";
 }
@@ -70,7 +70,7 @@ export const AnimatedLoader = React.forwardRef<
 
   // dots
   return (
-    <div ref={ref} className={cn("flex gap-2", className)} {...props}>
+    <div className={cn("flex gap-2", className)} {...(props as any)}>
       {[0, 1, 2].map((i) => (
         <motion.div
           key={i}

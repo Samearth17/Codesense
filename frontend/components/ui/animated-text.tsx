@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   fadeInUp,
@@ -11,7 +11,7 @@ import {
   itemVariants,
 } from "@/lib/animations";
 
-interface AnimatedTextProps extends React.HTMLAttributes<HTMLDivElement> {
+interface AnimatedTextProps extends HTMLMotionProps<"div"> {
   text: string;
   variant?: "fade" | "slide" | "blur" | "word" | "char";
   delay?: number;

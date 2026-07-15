@@ -433,8 +433,10 @@ export const wave: Variants = {
 
 export const slideToggle: Variants = {
   initial: { x: 0 },
-  animate: { x: 20 },
-  transition: { duration: 0.3, ease: "easeInOut" },
+  animate: {
+    x: 20,
+    transition: { duration: 0.3, ease: "easeInOut" },
+  },
 };
 
 // ── Transition Presets ──────────────────────────────────────────────────
