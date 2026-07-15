@@ -17,10 +17,7 @@ interface AnimatedTextProps extends HTMLMotionProps<"div"> {
   stagger?: boolean;
 }
 
-export const AnimatedText = React.forwardRef<
-  HTMLDivElement,
-  AnimatedTextProps
->(
+export const AnimatedText = React.forwardRef<HTMLDivElement, AnimatedTextProps>(
   (
     {
       text,
@@ -30,7 +27,7 @@ export const AnimatedText = React.forwardRef<
       className,
       ...props
     },
-    ref
+    ref,
   ) => {
     const variants = {
       fade: fadeInUp,
@@ -39,8 +36,7 @@ export const AnimatedText = React.forwardRef<
     };
 
     if (variant === "word" || variant === "char") {
-      const elements =
-        variant === "word" ? text.split(" ") : text.split("");
+      const elements = variant === "word" ? text.split(" ") : text.split("");
       const separator = variant === "word" ? " " : "";
 
       return (
@@ -75,7 +71,7 @@ export const AnimatedText = React.forwardRef<
         {text}
       </motion.div>
     );
-  }
+  },
 );
 
 AnimatedText.displayName = "AnimatedText";

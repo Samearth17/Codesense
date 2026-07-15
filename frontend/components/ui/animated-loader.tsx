@@ -29,7 +29,7 @@ export const AnimatedLoader = React.forwardRef<
         className={cn(
           "rounded-full border-2 border-transparent border-t-cyan-300 border-r-cyan-300",
           sizeMap[size],
-          className
+          className,
         )}
         {...props}
       />
@@ -45,7 +45,7 @@ export const AnimatedLoader = React.forwardRef<
         className={cn(
           "rounded-full bg-cyan-300/20 ring-1 ring-cyan-300/50",
           sizeMap[size],
-          className
+          className,
         )}
         {...props}
       />
@@ -58,11 +58,7 @@ export const AnimatedLoader = React.forwardRef<
         ref={ref}
         animate="animate"
         variants={bounce}
-        className={cn(
-          "rounded-full bg-cyan-300/30",
-          sizeMap[size],
-          className
-        )}
+        className={cn("rounded-full bg-cyan-300/30", sizeMap[size], className)}
         {...props}
       />
     );

@@ -10,31 +10,30 @@ interface AnimatedCardProps extends HTMLMotionProps<"div"> {
   delay?: number;
 }
 
-export const AnimatedCard = React.forwardRef<
-  HTMLDivElement,
-  AnimatedCardProps
->(({ variant = "fade", delay = 0, className, children, ...props }, ref) => {
-  const variants = {
-    fade: fadeInUp,
-    scale: scaleIn,
-    lift: hoverLift,
-  };
+export const AnimatedCard = React.forwardRef<HTMLDivElement, AnimatedCardProps>(
+  ({ variant = "fade", delay = 0, className, children, ...props }, ref) => {
+    const variants = {
+      fade: fadeInUp,
+      scale: scaleIn,
+      lift: hoverLift,
+    };
 
-  return (
-    <motion.div
-      ref={ref}
-      initial="hidden"
-      whileInView="visible"
-      whileHover={variant === "lift" ? "hover" : undefined}
-      variants={variants[variant]}
-      transition={{ delay }}
-      viewport={{ once: true, amount: 0.3 }}
-      className={cn("rounded-lg border border-line-strong", className)}
-      {...props}
-    >
-      {children}
-    </motion.div>
-  );
-});
+    return (
+      <motion.div
+        ref={ref}
+        initial="hidden"
+        whileInView="visible"
+        whileHover={variant === "lift" ? "hover" : undefined}
+        variants={variants[variant]}
+        transition={{ delay }}
+        viewport={{ once: true, amount: 0.3 }}
+        className={cn("rounded-lg border border-line-strong", className)}
+        {...props}
+      >
+        {children}
+      </motion.div>
+    );
+  },
+);
 
 AnimatedCard.displayName = "AnimatedCard";

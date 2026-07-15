@@ -223,11 +223,7 @@ Interactive animations triggered on hover.
 - **`hoverGlow`**: Add glow on hover
 
 ```tsx
-<motion.div
-  initial="initial"
-  whileHover="hover"
-  variants={hoverLift}
->
+<motion.div initial="initial" whileHover="hover" variants={hoverLift}>
   Hover me
 </motion.div>
 ```
@@ -303,6 +299,7 @@ Wrapper component for cards with built-in animations.
 ```
 
 **Props:**
+
 - `variant`: `"fade"` | `"scale"` | `"lift"` (default: `"fade"`)
 - `delay`: Number in seconds (default: `0`)
 - `children`: React node
@@ -312,12 +309,11 @@ Wrapper component for cards with built-in animations.
 Button with hover animation.
 
 ```tsx
-<AnimatedButton animationType="grow">
-  Click me
-</AnimatedButton>
+<AnimatedButton animationType="grow">Click me</AnimatedButton>
 ```
 
 **Props:**
+
 - `animationType`: `"grow"` | `"glow"` | `"lift"` (default: `"grow"`)
 - All standard button props
 
@@ -332,6 +328,7 @@ Badge with optional pulse or glow animation.
 ```
 
 **Props:**
+
 - `animated`: Boolean (default: `false`)
 - `glowing`: Boolean (default: `false`)
 - All standard badge props
@@ -345,6 +342,7 @@ Text with character or word-by-word animation.
 ```
 
 **Props:**
+
 - `text`: String to animate
 - `variant`: `"fade"` | `"slide"` | `"blur"` | `"word"` | `"char"` (default: `"fade"`)
 - `delay`: Number in seconds
@@ -359,6 +357,7 @@ Loading indicator with multiple styles.
 ```
 
 **Props:**
+
 - `type`: `"spin"` | `"pulse"` | `"bounce"` | `"dots"` (default: `"spin"`)
 - `size`: `"sm"` | `"md"` | `"lg"` (default: `"md"`)
 
@@ -375,6 +374,7 @@ Container for staggered child animations.
 ```
 
 **Props:**
+
 - `stagger`: Boolean (default: `true`)
 - `delay`: Number in seconds
 - `children`: React nodes
@@ -386,12 +386,11 @@ Pre-configured transition objects for consistency.
 ```tsx
 import { transitionPresets } from "@/lib/animations";
 
-<motion.div transition={transitionPresets.base}>
-  Content
-</motion.div>
+<motion.div transition={transitionPresets.base}>Content</motion.div>;
 ```
 
 **Available presets:**
+
 - `fast`: 0.2s duration
 - `base`: 0.4s duration (default)
 - `slow`: 0.6s duration
@@ -420,11 +419,7 @@ Trigger animations when elements enter the viewport:
 Use container variants to stagger children:
 
 ```tsx
-<motion.div
-  variants={containerVariants}
-  initial="hidden"
-  animate="visible"
->
+<motion.div variants={containerVariants} initial="hidden" animate="visible">
   {items.map((item) => (
     <motion.div key={item.id} variants={itemVariants}>
       {item.content}
@@ -452,7 +447,7 @@ Layer animations for complex effects:
 All animations use the same easing curve for consistency:
 
 ```tsx
-ease: [0.16, 1, 0.3, 1] // Cubic Bezier
+ease: [0.16, 1, 0.3, 1]; // Cubic Bezier
 ```
 
 ### 5. Respect User Preferences
@@ -461,7 +456,7 @@ Consider `prefers-reduced-motion`:
 
 ```tsx
 const prefersReducedMotion = window.matchMedia(
-  "(prefers-reduced-motion: reduce)"
+  "(prefers-reduced-motion: reduce)",
 ).matches;
 
 <motion.div
@@ -469,7 +464,7 @@ const prefersReducedMotion = window.matchMedia(
   transition={prefersReducedMotion ? { duration: 0 } : undefined}
 >
   Content
-</motion.div>
+</motion.div>;
 ```
 
 ## Performance Tips
