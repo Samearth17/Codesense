@@ -2,7 +2,6 @@
 
 import React from "react";
 import { motion, HTMLMotionProps } from "framer-motion";
-import { cn } from "@/lib/utils";
 import {
   fadeInUp,
   slideInUp,
@@ -27,7 +26,7 @@ export const AnimatedText = React.forwardRef<
       text,
       variant = "fade",
       delay = 0,
-      stagger = false,
+      stagger: _stagger, // eslint-disable-line @typescript-eslint/no-unused-vars
       className,
       ...props
     },

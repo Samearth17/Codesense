@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion, HTMLMotionProps } from "framer-motion";
+import { motion } from "framer-motion";
 import { Badge, type BadgeProps } from "./badge";
 import { pulse, glowPulse } from "@/lib/animations";
 

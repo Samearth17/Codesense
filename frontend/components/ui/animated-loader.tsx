@@ -70,7 +70,11 @@ export const AnimatedLoader = React.forwardRef<
 
   // dots
   return (
-    <div className={cn("flex gap-2", className)} {...(props as any)}>
+    <div
+      ref={ref}
+      className={cn("flex gap-2", className)}
+      {...(props as React.HTMLAttributes<HTMLDivElement>)}
+    >
       {[0, 1, 2].map((i) => (
         <motion.div
           key={i}

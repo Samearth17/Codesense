@@ -2,7 +2,6 @@
 
 import React from "react";
 import { motion, HTMLMotionProps } from "framer-motion";
-import { cn } from "@/lib/utils";
 import { containerVariants, staggerContainer } from "@/lib/animations";
 
 interface AnimatedContainerProps extends HTMLMotionProps<"div"> {

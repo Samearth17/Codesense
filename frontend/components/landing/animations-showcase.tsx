@@ -11,17 +11,7 @@ import {
   SectionContainer,
   SectionHeading,
 } from "@/components/ui";
-import {
-  fadeInUp,
-  slideInLeft,
-  slideInRight,
-  scaleIn,
-  containerVariants,
-  itemVariants,
-  spin,
-  bounce,
-  pulse,
-} from "@/lib/animations";
+import { itemVariants } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 import { spacing } from "@/lib/design-tokens";
 
