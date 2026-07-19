@@ -17,6 +17,14 @@ class FeatureSnapshot(BaseModel):
     avg_cyclomatic_complexity: float
 
 
+class VulnerabilityResult(BaseModel):
+    rule: str
+    severity: str
+    line: int
+    message: str
+    ai_pattern: bool
+
+
 class PredictResponse(BaseModel):
     label: str
     confidence: float
@@ -24,3 +32,5 @@ class PredictResponse(BaseModel):
     top_signals: list[str]
     features: FeatureSnapshot
     filename: str
+    vulnerabilities: list[VulnerabilityResult]
+    vulnerability_count: int

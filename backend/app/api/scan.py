@@ -7,7 +7,7 @@ import structlog
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.dependencies import get_predictor
-from app.schemas.scan import FeatureSnapshot, ScanRequest, ScanResponse
+from app.schemas.scan import FeatureSnapshot, ScanRequest, ScanResponse, VulnerabilityResult
 
 router = APIRouter(tags=["scan"])
 logger = structlog.get_logger(__name__)
@@ -60,6 +60,8 @@ def scan_code(
             is_ai=result["is_ai"],
             top_signals=result["top_signals"],
             filename=result["filename"],
+            vulnerabilities=[VulnerabilityResult(**item) for item in result["vulnerabilities"]],
+            vulnerability_count=result["vulnerability_count"],
             features=FeatureSnapshot(**result["features"]),
         )
     except ValueError as exc:

@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from .predictor import CodeSensePredictor, get_predictor
-from .schemas import FeatureSnapshot, PredictRequest, PredictResponse
+from .schemas import FeatureSnapshot, PredictRequest, PredictResponse, VulnerabilityResult
 
 predictor: CodeSensePredictor = None
 
@@ -61,7 +61,9 @@ def predict(request: PredictRequest):
             is_ai=result["is_ai"],
             top_signals=result["top_signals"],
             filename=result["filename"],
+            vulnerabilities=[VulnerabilityResult(**item) for item in result["vulnerabilities"]],
+            vulnerability_count=result["vulnerability_count"],
             features=FeatureSnapshot(**result["features"]),
         )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc

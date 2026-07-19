@@ -14,6 +14,7 @@ ENV PATH="/app/.venv/bin:$PATH"
 COPY backend/app ./app
 COPY ml/inference ./ml/inference
 COPY ml/feature_extractors ./ml/feature_extractors
+COPY ml/vulnerability ./ml/vulnerability
 COPY ml/models ./ml/models
 COPY ml/pyproject.toml ./ml/pyproject.toml
 EXPOSE 8000

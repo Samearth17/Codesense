@@ -13,15 +13,17 @@ except ImportError:
 def extract_features(code: str) -> dict:
     features = {}
     lines = code.splitlines()
-    non_empty = [l for l in lines if l.strip()]
-    comment_lines = [l for l in lines if l.strip().startswith("#")]
+    non_empty = [line for line in lines if line.strip()]
+    comment_lines = [line for line in lines if line.strip().startswith("#")]
 
     # ── TIER 1: Formatting ──────────────────────────────────────────
     features["total_lines"] = len(lines)
     features["blank_line_ratio"] = round((len(lines) - len(non_empty)) / max(len(lines), 1), 4)
-    features["avg_line_length"] = round(sum(len(l) for l in non_empty) / max(len(non_empty), 1), 2)
+    features["avg_line_length"] = round(
+        sum(len(line) for line in non_empty) / max(len(non_empty), 1), 2
+    )
     features["long_line_ratio"] = round(
-        sum(1 for l in lines if len(l) > 79) / max(len(lines), 1), 4
+        sum(1 for line in lines if len(line) > 79) / max(len(lines), 1), 4
     )
 
     # ── TIER 1: Comments ────────────────────────────────────────────
@@ -65,9 +67,7 @@ def extract_features(code: str) -> dict:
         # ── TIER 1: Naming ───────────────────────────────────────────
         builtin_names = set(dir(builtins))
         names = [
-            n.id
-            for n in ast.walk(tree)
-            if isinstance(n, ast.Name) and n.id not in builtin_names
+            n.id for n in ast.walk(tree) if isinstance(n, ast.Name) and n.id not in builtin_names
         ]
         features["avg_identifier_length"] = round(
             sum(len(n) for n in names) / max(len(names), 1), 2

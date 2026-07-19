@@ -1,0 +1,7 @@
+- id: codesense
+  name: Detect AI-generated code
+  description: Flags Python files with high AI-generation confidence
+  entry: codesense scan
+  language: python
+  types: [python]
+  args: ["--threshold", "0.8", "--format", "json"]

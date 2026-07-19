@@ -9,11 +9,13 @@ import xgboost as xgb
 ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT / "ml"))
 
-from feature_extractors.extractor import extract_features
+from feature_extractors.extractor import extract_features  # noqa: E402
+from vulnerability.scanner import VulnerabilityScanner  # noqa: E402
 
 MODELS_DIR = ROOT / "ml" / "models"
 META_PATH = MODELS_DIR / "model_meta.json"
 MODEL_PATH = MODELS_DIR / "codesense_xgb.json"
+
 
 class CodeSensePredictor:
     def __init__(self):
@@ -22,17 +24,16 @@ class CodeSensePredictor:
         self.model = xgb.XGBClassifier()
         self.model.load_model(str(MODEL_PATH))
         self.explainer = shap.TreeExplainer(self.model)
+        self.vuln_scanner = VulnerabilityScanner()
         print(f"✓ Model loaded ({meta['num_features']} features, AUC {meta['test_auc']})")
 
     def predict(self, code: str, filename: str = "unnamed.py") -> dict:
         raw = extract_features(code)
+        vuln_results = self.vuln_scanner.scan(code)
 
         missing_features = sorted(set(self.feature_names) - raw.keys())
         if missing_features:
-            print(
-                "⚠️ Missing model features will be zero-filled: "
-                f"{', '.join(missing_features)}"
-            )
+            print(f"⚠️ Missing model features will be zero-filled: {', '.join(missing_features)}")
 
         vector = np.array([raw.get(f, 0.0) for f in self.feature_names], dtype=np.float32).reshape(
             1, -1
@@ -49,6 +50,8 @@ class CodeSensePredictor:
             "is_ai": label == "ai",
             "top_signals": top_signals,
             "filename": filename,
+            "vulnerabilities": vuln_results,
+            "vulnerability_count": len(vuln_results),
             "features": {
                 "docstring_ratio": round(raw.get("docstring_ratio", 0), 4),
                 "type_annotation_ratio": round(raw.get("type_annotation_ratio", 0), 4),

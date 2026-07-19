@@ -26,9 +26,9 @@
     "maintainability_index"
   ],
   "num_features": 24,
-  "cv_auc_mean": 0.994,
-  "cv_auc_std": 0.0022,
-  "test_auc": 0.9939,
+  "cv_auc_mean": 0.9931,
+  "cv_auc_std": 0.002,
+  "test_auc": 0.9935,
   "train_size": 3372,
   "test_size": 843
 }

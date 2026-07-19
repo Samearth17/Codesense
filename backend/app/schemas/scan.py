@@ -47,6 +47,16 @@ class FeatureSnapshot(BaseModel):
     avg_cyclomatic_complexity: float
 
 
+class VulnerabilityResult(BaseModel):
+    """A static-analysis vulnerability finding."""
+
+    rule: str
+    severity: str = Field(..., pattern="^(high|medium|low)$")
+    line: int = Field(..., ge=1)
+    message: str
+    ai_pattern: bool
+
+
 class ScanResponse(BaseModel):
     """Structured result of an authorship analysis."""
 
@@ -62,3 +72,5 @@ class ScanResponse(BaseModel):
         description="Key code metrics extracted during analysis.",
     )
     filename: str
+    vulnerabilities: list[VulnerabilityResult]
+    vulnerability_count: int = Field(..., ge=0)

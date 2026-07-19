@@ -9,6 +9,14 @@ export type FeatureSnapshot = {
   avg_cyclomatic_complexity: number;
 };
 
+export type VulnerabilityResult = {
+  rule: string;
+  severity: "high" | "medium" | "low";
+  line: number;
+  message: string;
+  ai_pattern: boolean;
+};
+
 export type ScanResult = {
   label: "ai" | "human" | string;
   confidence: number;
@@ -16,6 +24,8 @@ export type ScanResult = {
   top_signals: string[];
   features: FeatureSnapshot;
   filename: string;
+  vulnerabilities: VulnerabilityResult[];
+  vulnerability_count: number;
 };
 
 export type ScanRequest = {

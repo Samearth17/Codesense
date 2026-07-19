@@ -29,7 +29,12 @@ import {
   typography,
   type Accent,
 } from "@/lib/design-tokens";
-import type { FeatureSnapshot, ScanRequest, ScanResult } from "@/lib/types";
+import type {
+  FeatureSnapshot,
+  ScanRequest,
+  ScanResult,
+  VulnerabilityResult,
+} from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const DEFAULT_API_URL = "http://localhost:8000";
@@ -132,6 +137,67 @@ def is_prime(num: int) -> bool:
             return False
     return True`;
 
+const DEMO_EXAMPLES: Array<{ label: string; filename: string; code: string }> = [
+  {
+    label: "ChatGPT: fibonacci",
+    filename: "fibonacci.py",
+    code: `def fibonacci(n):
+    if n <= 1:
+        return n
+    a, b = 0, 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b`,
+  },
+  {
+    label: "Human: LeetCode",
+    filename: "two_sum.py",
+    code: `def twoSum(nums: list[int], target: int) -> list[int]:
+    """Find indices of two values that sum to target.
+
+    The loop preserves the familiar one-pass hash-map approach used in
+    programming contests, returning when a matching complement appears.
+    """
+    positions: dict[int, int] = {}
+    for index, value in enumerate(nums):
+        complement = target - value
+        if complement in positions:
+            return [positions[complement], index]
+        positions[value] = index
+    return []`,
+  },
+  {
+    label: "AI with vulns",
+    filename: "auth.py",
+    code: `def authenticate_user(username, password):
+    """Authenticate a user against the database."""
+    db_password = "admin123"
+    query = "SELECT * FROM users WHERE username = '" + username + "'"
+    try:
+        result = db.execute(query)
+        if result and password == db_password:
+            return True
+    except:
+        pass
+    return False`,
+  },
+  {
+    label: "Clean human",
+    filename: "merge.py",
+    code: `def merge_sorted(a, b):
+    res = []
+    i = j = 0
+    while i < len(a) and j < len(b):
+        if a[i] < b[j]:
+            res.append(a[i])
+            i += 1
+        else:
+            res.append(b[j])
+            j += 1
+    return res + a[i:] + b[j:]`,
+  },
+];
+
 const SIGNAL_LABELS: Record<string, string> = {
   docstring_ratio: "High docstring coverage across functions",
   type_annotation_ratio:
@@ -229,9 +295,9 @@ export default function ScanPage() {
     }
   }, [code, filename]);
 
-  const loadExample = useCallback(() => {
-    setCode(EXAMPLE_CODE);
-    setFilename("fibonacci.py");
+  const loadExample = useCallback((example = DEMO_EXAMPLES[0]) => {
+    setCode(example.code);
+    setFilename(example.filename);
     setResult(null);
     setError(null);
   }, []);
@@ -330,7 +396,7 @@ export default function ScanPage() {
                   />
                 </div>
                 <button
-                  onClick={loadExample}
+                  onClick={() => loadExample()}
                   className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
                 >
                   <Code2 className="size-3.5" aria-hidden />
@@ -347,6 +413,18 @@ export default function ScanPage() {
                 spellCheck={false}
                 className="h-[420px] w-full resize-none bg-transparent px-5 py-4 font-mono text-sm leading-6 text-foreground placeholder:text-muted-foreground/40 focus:outline-none"
               />
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-2" aria-label="Demo examples">
+              {DEMO_EXAMPLES.map((example) => (
+                <button
+                  key={example.label}
+                  onClick={() => loadExample(example)}
+                  className="rounded-full border border-line-subtle bg-white/[0.03] px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-cyan-300/30 hover:bg-cyan-300/10 hover:text-cyan-100"
+                >
+                  {example.label}
+                </button>
+              ))}
             </div>
 
             {/* Action bar */}
@@ -521,6 +599,9 @@ function ResultsPanel({ result }: { result: ScanResult }) {
         <Badge variant={isAI ? "violet" : "emerald"}>
           {result.label.toUpperCase()}
         </Badge>
+        <Badge variant={result.vulnerability_count ? "amber" : "emerald"}>
+          {result.vulnerability_count} vulns
+        </Badge>
       </div>
 
       {/* Evidence */}
@@ -531,6 +612,8 @@ function ResultsPanel({ result }: { result: ScanResult }) {
           badge={`${signalDescriptions.length} signals`}
         />
       )}
+
+      <VulnerabilitiesPanel findings={result.vulnerabilities} />
 
       {/* Metric bars */}
       <ChartContainer title="Feature Breakdown">
@@ -547,4 +630,52 @@ function ResultsPanel({ result }: { result: ScanResult }) {
       </ChartContainer>
     </motion.div>
   );
+}
+
+function VulnerabilitiesPanel({ findings }: { findings: VulnerabilityResult[] }) {
+  if (findings.length === 0) {
+    return (
+      <div className="rounded-lg border border-emerald-300/20 bg-emerald-300/5 p-4">
+        <p className="text-sm font-medium text-emerald-100">No vulnerabilities detected</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          The static scanner did not find any configured vulnerability patterns.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <section className="rounded-lg border border-line-subtle bg-white/[0.025] p-4">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="text-sm font-semibold text-foreground">Vulnerabilities</h2>
+        <Badge variant="amber">{findings.length} found</Badge>
+      </div>
+      <div className="space-y-2">
+        {findings.map((finding) => (
+          <div
+            key={`${finding.rule}-${finding.line}`}
+            className="rounded-md border border-line-subtle bg-background/40 p-3"
+          >
+            <div className="flex items-center gap-2">
+              <SeverityBadge severity={finding.severity} />
+              <span className="text-xs text-muted-foreground">Line {finding.line}</span>
+              <span className="text-sm font-medium text-foreground">
+                {finding.rule.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase())}
+              </span>
+            </div>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">{finding.message}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function SeverityBadge({ severity }: { severity: VulnerabilityResult["severity"] }) {
+  const className = {
+    high: "border-rose-300/30 bg-rose-300/10 text-rose-100",
+    medium: "border-orange-300/30 bg-orange-300/10 text-orange-100",
+    low: "border-amber-300/30 bg-amber-300/10 text-amber-100",
+  }[severity];
+  return <Badge className={className}>{severity.toUpperCase()}</Badge>;
 }

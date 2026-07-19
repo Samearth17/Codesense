@@ -33,6 +33,7 @@ def test_scan_endpoint_valid_human_code(client: TestClient) -> None:
     assert validated.filename == "add.py"
     assert validated.label in ("human", "ai")
     assert validated.confidence >= 0.0 and validated.confidence <= 1.0
+    assert validated.vulnerability_count == len(validated.vulnerabilities)
 
 
 def test_scan_endpoint_empty_code(client: TestClient) -> None:
