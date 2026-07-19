@@ -1,4 +1,5 @@
 import ast
+import builtins
 
 try:
     import radon.complexity as radon_cc
@@ -62,7 +63,12 @@ def extract_features(code: str) -> dict:
         features["docstring_ratio"] = round(docstrings / max(len(functions), 1), 4)
 
         # ── TIER 1: Naming ───────────────────────────────────────────
-        names = [n.id for n in ast.walk(tree) if isinstance(n, ast.Name)]
+        builtin_names = set(dir(builtins))
+        names = [
+            n.id
+            for n in ast.walk(tree)
+            if isinstance(n, ast.Name) and n.id not in builtin_names
+        ]
         features["avg_identifier_length"] = round(
             sum(len(n) for n in names) / max(len(names), 1), 2
         )

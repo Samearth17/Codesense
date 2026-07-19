@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+import shap
 import xgboost as xgb
 
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -14,32 +15,24 @@ MODELS_DIR = ROOT / "ml" / "models"
 META_PATH = MODELS_DIR / "model_meta.json"
 MODEL_PATH = MODELS_DIR / "codesense_xgb.json"
 
-SIGNAL_PRIORITY = [
-    "docstring_ratio",
-    "type_annotation_ratio",
-    "maintainability_index",
-    "avg_identifier_length",
-    "single_char_var_ratio",
-    "comment_density",
-    "blank_line_ratio",
-    "avg_cyclomatic_complexity",
-    "magic_number_count",
-    "assertion_count",
-    "num_try_except",
-    "long_line_ratio",
-]
-
-
 class CodeSensePredictor:
     def __init__(self):
         meta = json.loads(META_PATH.read_text())
         self.feature_names: list[str] = meta["features"]
         self.model = xgb.XGBClassifier()
         self.model.load_model(str(MODEL_PATH))
+        self.explainer = shap.TreeExplainer(self.model)
         print(f"✓ Model loaded ({meta['num_features']} features, AUC {meta['test_auc']})")
 
     def predict(self, code: str, filename: str = "unnamed.py") -> dict:
         raw = extract_features(code)
+
+        missing_features = sorted(set(self.feature_names) - raw.keys())
+        if missing_features:
+            print(
+                "⚠️ Missing model features will be zero-filled: "
+                f"{', '.join(missing_features)}"
+            )
 
         vector = np.array([raw.get(f, 0.0) for f in self.feature_names], dtype=np.float32).reshape(
             1, -1
@@ -48,7 +41,7 @@ class CodeSensePredictor:
         proba = self.model.predict_proba(vector)[0]
         ai_confidence = float(proba[1])
         label = "ai" if ai_confidence >= 0.5 else "human"
-        top_signals = self._top_signals(raw, label)
+        top_signals = self._top_signals(vector)
 
         return {
             "label": label,
@@ -68,15 +61,25 @@ class CodeSensePredictor:
             },
         }
 
-    def _top_signals(self, features: dict, label: str) -> list[str]:
-        signals = []
-        for feat in SIGNAL_PRIORITY:
-            val = features.get(feat, 0)
-            if feat == "docstring_ratio" and val > 0.6 or feat == "type_annotation_ratio" and val > 0.6 or feat == "maintainability_index" and val > 80 or feat == "single_char_var_ratio" and val < 0.03 or feat == "avg_identifier_length" and val > 8 or feat == "comment_density" and val > 0.2 or feat == "assertion_count" and val > 3 or feat == "num_try_except" and val > 2:
-                signals.append(feat)
-            if len(signals) == 3:
-                break
-        return signals if signals else ["avg_cyclomatic_complexity"]
+    def _top_signals(self, vector: np.ndarray) -> list[str]:
+        shap_values = np.asarray(self.explainer.shap_values(vector))
+        if shap_values.ndim == 3:
+            shap_values = shap_values[0]
+            if shap_values.shape[0] == len(self.feature_names):
+                shap_values = shap_values[:, -1]
+            else:
+                shap_values = shap_values[-1]
+        elif shap_values.ndim == 2:
+            shap_values = shap_values[0]
+
+        if shap_values.shape[0] != len(self.feature_names):
+            raise ValueError(
+                "SHAP output does not match the model feature schema: "
+                f"got {shap_values.shape[0]} values for {len(self.feature_names)} features"
+            )
+
+        ranked_indices = np.argsort(np.abs(shap_values))[::-1][:3]
+        return [self.feature_names[index] for index in ranked_indices]
 
 
 _predictor: CodeSensePredictor | None = None
